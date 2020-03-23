@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 
-from database import db, test
+from database import db, tests
+from database.test_dao import TestDao
 
 app = FastAPI()
 
@@ -23,6 +24,10 @@ async def root():
 
 @app.get("/test")
 async def test1():
-    query = test.select()
-    result = await db.fetch_all(query)
+    # query = tests.select().where(tests.c.id == 1)
+    # query = tests.select().where(tests.c.id.in_([1, 2]))
+    # result = await db.fetch_all(query)
+    result = await TestDao.find_by_id(4)
+    # result = await TestDao.get_all()
+    # print(list(map(lambda x: x.created, result)))
     return result
