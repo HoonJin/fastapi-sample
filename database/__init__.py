@@ -15,6 +15,6 @@ db = Database(__DB_URL, min_size=__MIN_POOL_SIZE, max_size=__MAX_POOL_SIZE)
 
 metadata = sqlalchemy.MetaData()
 
-engine = sqlalchemy.create_engine(__DB_URL, connect_args={})
+__engine = sqlalchemy.create_engine(__DB_URL, connect_args={})
 
-metadata.create_all(engine)
+metadata.create_all(__engine)

@@ -1,1 +1,1 @@
-from test.test_dao import TestDao
+from .test_router import router as test_router
