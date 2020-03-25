@@ -1,7 +1,8 @@
 from fastapi import FastAPI
+from fastapi.responses import JSONResponse
 
-from database import db, tests
-from database.test_dao import TestDao
+from database import db
+from test import TestDao
 
 app = FastAPI()
 
@@ -22,12 +23,21 @@ async def root():
     return result
 
 
-@app.get("/test")
+@app.get("/tests")
 async def test1():
     # query = tests.select().where(tests.c.id == 1)
     # query = tests.select().where(tests.c.id.in_([1, 2]))
     # result = await db.fetch_all(query)
-    result = await TestDao.find_by_id(4)
-    # result = await TestDao.get_all()
+    result = await TestDao.get_all()
     # print(list(map(lambda x: x.created, result)))
     return result
+
+
+@app.get("/tests/{t_id}")
+async def test2(t_id):
+    result = await TestDao.find_by_id(t_id)
+    return result if result is not None else JSONResponse(status_code=404, content={})
+    # if result is not None:
+    #     return result
+    # else:
+    #     return JSONResponse(status_code=404, content={})

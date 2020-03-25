@@ -1,15 +1,8 @@
-from datetime import datetime
-from typing import Optional, List
+from typing import List
 
-from pydantic import BaseModel
-
-from database import tests, db
-
-
-class Test(BaseModel):
-    id: int
-    varchar: Optional[str]
-    created: datetime
+from database import db
+from .domains import *
+from .schemas import tests
 
 
 class TestDao:
