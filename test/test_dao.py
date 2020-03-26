@@ -1,7 +1,7 @@
-from typing import List
+from typing import List, Optional
 
 from database import db
-from .domains import *
+from .domains import Test
 from .schemas import tests
 
 
