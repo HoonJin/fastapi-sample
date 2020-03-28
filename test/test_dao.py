@@ -12,6 +12,17 @@ class TestDao:
         return list(map(lambda x: Test(**x), await db.fetch_all(query)))
 
     @staticmethod
+    async def get_all_count() -> int:
+        query = tests.count()
+        return await db.fetch_val(query)
+
+    @staticmethod
+    async def get_all_with_offset_and_limit(offset: int, limit: int) -> List[Test]:
+        query = tests.select().offset(offset).limit(limit)
+        print(query)
+        return list(map(lambda x: Test(**x), await db.fetch_all(query)))
+
+    @staticmethod
     async def get_by_id(test_id: int) -> Test:
         query = tests.select().where(tests.c.id == test_id)
         return Test(** await db.fetch_one(query))

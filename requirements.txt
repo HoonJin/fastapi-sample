@@ -3,7 +3,7 @@ cffi==1.14.0
 click==7.1.1
 cryptography==2.8
 databases==0.2.6
-fastapi==0.52.0
+fastapi==0.53.0
 h11==0.9.0
 httptools==0.1.1
 mysqlclient==1.4.6
