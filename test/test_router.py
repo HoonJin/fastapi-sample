@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
 from starlette.status import HTTP_404_NOT_FOUND
 
@@ -19,11 +19,14 @@ async def get_all():
 
 
 @test_router.get('/tests/pagination')
-async def test3(request: Request):
-    params = request.query_params
-    page = int(params.get('page'))
-    per_page = int(params.get('per_page'))
+async def get_by_pagination(page: int = 1, per_page: int = 20):
     return await test_service.get_all_pagination(page, per_page)
+
+
+@test_router.get('/tests/{t_id}', tags=['tests'], response_model=Test)
+async def get(t_id: int):
+    result = await TestDao.find_by_id(t_id)
+    return result if result is not None else JSONResponse(status_code=HTTP_404_NOT_FOUND, content={})
 
     # try:
     #     return await TestDao.get_by_id(t_id)
@@ -34,9 +37,3 @@ async def test3(request: Request):
     #     return result
     # else:
     #     return JSONResponse(status_code=404, content={})
-
-
-@test_router.get('/tests/{t_id}', tags=['tests'], response_model=Test)
-async def get(t_id: int):
-    result = await TestDao.find_by_id(t_id)
-    return result if result is not None else JSONResponse(status_code=HTTP_404_NOT_FOUND, content={})

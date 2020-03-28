@@ -19,7 +19,6 @@ class TestDao:
     @staticmethod
     async def get_all_with_offset_and_limit(offset: int, limit: int) -> List[Test]:
         query = tests.select().offset(offset).limit(limit)
-        print(query)
         return list(map(lambda x: Test(**x), await db.fetch_all(query)))
 
     @staticmethod
