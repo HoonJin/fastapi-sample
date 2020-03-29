@@ -32,3 +32,9 @@ class TestDao:
         # 코드를 예쁘게 보일 방법을 찾아봐야함
         result = await db.fetch_one(query)
         return Test(**result) if result is not None else None
+
+    @staticmethod
+    async def delete_by_id(test_id: int):
+        query = tests.delete().where(tests.c.id == test_id)
+        result = await db.execute(query)
+        return result
