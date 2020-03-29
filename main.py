@@ -1,4 +1,7 @@
+import uvicorn
 from fastapi import FastAPI
+
+from config import conf
 from test import test_router
 
 from database import db
@@ -21,3 +24,8 @@ async def shutdown():
 async def root():
     result = {"hello": "world"}
     return result
+
+
+if __name__ == '__main__':
+    log_level = conf.get('LOG_LEVEL', str, 'info')
+    uvicorn.run(app, host='127.0.0.1', port=8000, log_level=log_level)
