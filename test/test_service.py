@@ -1,3 +1,7 @@
+from fastapi import HTTPException
+from starlette import status
+
+from database import db
 from .test_dao import TestDao
 
 
@@ -13,3 +17,12 @@ class TestService:
             'total_cnt': total_cnt,
             'total_page': total_page
         }
+
+    @staticmethod
+    async def delete(t_id: int) -> None:
+        row = await TestDao.find_by_id(t_id)
+        if row is not None:
+            async with db.transaction():
+                await TestDao.delete_by_id(t_id)
+        else:
+            raise HTTPException(status.HTTP_404_NOT_FOUND)
