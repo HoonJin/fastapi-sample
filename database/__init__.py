@@ -1,5 +1,6 @@
 import sqlalchemy
 from databases import Database
+from sqlalchemy.testing.schema import Table
 
 from config import conf
 
@@ -11,7 +12,13 @@ db = Database(__DB_URL,
               )
 
 metadata = sqlalchemy.MetaData()
-
 __engine = sqlalchemy.create_engine(__DB_URL, connect_args={})
+metadata.reflect(bind=__engine)
+__tables = metadata.tables
+
+
+def get_schema(name: str) -> Table:
+    return __tables[name]
+
 
 metadata.create_all(__engine)

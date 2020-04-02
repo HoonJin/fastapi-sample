@@ -1,8 +1,9 @@
 from typing import List, Optional
 
-from database import db
+from database import db, get_schema
 from .domains import Test
-from .schemas import tests
+
+tests = get_schema('tests')
 
 
 class TestDao:

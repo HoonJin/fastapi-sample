@@ -8,3 +8,6 @@ class Test(BaseModel):
     id: int
     varchar: Optional[str]
     created: datetime
+
+    class Config:
+        orm_mode = True
