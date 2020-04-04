@@ -7,10 +7,6 @@ from starlette.responses import JSONResponse
 
 async def custom_http_exception_handler(request: Request, exc: HTTPException) -> JSONResponse:
     headers = getattr(exc, "headers", None)
-    # if request.user is not None:
-    #     logging.error(f'"{request.method} {request.url}" {request.user}\'s request is failed. '
-    #                   f'exception: {exc.status_code} {exc.detail}')
-    # else:
     logging.error(f'"{request.method} {request.url}" request is failed. '
                   f'exception: {exc.status_code} {exc.detail}')
     return await exception_handlers.http_exception_handler(request, exc)
