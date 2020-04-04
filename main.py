@@ -3,7 +3,7 @@ from fastapi import FastAPI, HTTPException
 
 from config import conf, ex_handlers
 from database import db
-from test import test_router
+from app.test import test_router
 
 ENV = conf.get('ENV', str, 'dev')
 app = FastAPI(
