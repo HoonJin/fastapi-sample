@@ -1,9 +1,7 @@
 from typing import List
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, status
 from fastapi.responses import JSONResponse
-from starlette.requests import Request
-from starlette import status
 
 from .domains import Test
 from .test_dao import TestDao
@@ -29,7 +27,7 @@ async def get(t_id: int):
     #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
-@test_router.get('/tests/pagination', response_model=List[Test], description='adsfasdf')
+@test_router.get('/tests/pagination', description='adsfasdf')
 async def get_by_pagination(page: int = 1, per_page: int = 20):
     return await test_service.get_all_pagination(page, per_page)
 

@@ -1,16 +1,16 @@
 import uvicorn
 from fastapi import FastAPI, HTTPException
 
-from config import conf, ex_handlers
-from database import db
 from app.test import test_router
+from config import conf, ex_handlers, route_dependency
+from database import db
 
 ENV = conf.get('ENV', str, 'dev')
 app = FastAPI(
     docs_url='/docs' if ENV == 'dev' else None,
-    openapi_url='/openapi.json' if ENV == 'dev' else None
+    openapi_url='/openapi.json' if ENV == 'dev' else None,
 )
-app.include_router(test_router, tags=['tests'])
+app.include_router(test_router, tags=['tests'], dependencies=route_dependency.public_dependencies)
 
 app.add_exception_handler(HTTPException, ex_handlers.custom_http_exception_handler)
 
