@@ -11,3 +11,7 @@ class Test(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class TestCreate(BaseModel):
+    varchar: str

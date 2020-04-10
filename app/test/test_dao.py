@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List, Optional
 
 from database import db, get_schema
@@ -39,3 +40,9 @@ class TestDao:
         query = tests.delete().where(tests.c.id == test_id)
         result = await db.execute(query)
         return result
+
+    @staticmethod
+    async def insert(varchar: str):
+        now = datetime.now()
+        query = tests.insert().values(varchar=varchar, created=now)
+        return await db.execute(query)
