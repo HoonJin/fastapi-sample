@@ -7,6 +7,7 @@ from database import db
 
 ENV = conf.get('ENV', str, 'dev')
 app = FastAPI(
+    debug=True if ENV == 'dev' else conf.get('DEBUG', bool, False),
     docs_url='/docs' if ENV == 'dev' else None,
     openapi_url='/openapi.json' if ENV == 'dev' else None,
 )
