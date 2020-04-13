@@ -1,8 +1,11 @@
+import logging
+from datetime import datetime
+
 import uvicorn
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Response, Request
 
 from app.test import test_router
-from config import conf, ex_handlers, route_dependency
+from config import conf, ex_handlers
 from database import db
 
 ENV = conf.get('ENV', str, 'dev')
@@ -11,9 +14,24 @@ app = FastAPI(
     docs_url='/docs' if ENV == 'dev' else None,
     openapi_url='/openapi.json' if ENV == 'dev' else None,
 )
-app.include_router(test_router, tags=['tests'], dependencies=route_dependency.public_dependencies)
+app.include_router(test_router, tags=['tests'])
 
 app.add_exception_handler(HTTPException, ex_handlers.custom_http_exception_handler)
+
+
+@app.middleware("http")
+async def __request_logging(req: Request, call_next) -> Response:
+    request_id = req.headers.get('X-Request-ID', '')
+    if req.method == "POST":
+        request_info = f"body: {(await req.body()).decode('UTF-8')}"
+    elif req.method == "PUT" or req.method == "DELETE":
+        request_info = f"path_params: {req.path_params}, body: {(await req.body()).decode('UTF-8')}"
+    else:  # GET
+        request_info = f"query_params: {req.query_params}"
+    logging.info(f"[{request_id}][{datetime.utcnow()}] {req.method} {req.get('path')} {request_info}")
+    res: Response = await call_next(req)
+    logging.info(f"[{request_id}][{datetime.utcnow()}] code: {res.status_code}, headers: {res.headers}")
+    return res
 
 
 @app.on_event("startup")
