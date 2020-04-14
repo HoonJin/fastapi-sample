@@ -1,6 +1,6 @@
 import sqlalchemy
 from databases import Database
-from sqlalchemy.testing.schema import Table
+from sqlalchemy import Table
 
 from config import conf
 

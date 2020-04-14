@@ -1,10 +1,12 @@
 from datetime import datetime
 from typing import List, Optional
 
+from sqlalchemy import Table
+
 from database import db, get_schema
 from .domains import Test
 
-tests = get_schema('tests')
+tests: Table = get_schema('tests')
 
 
 class TestDao:
@@ -43,6 +45,10 @@ class TestDao:
 
     @staticmethod
     async def insert(varchar: str):
-        now = datetime.now()
-        query = tests.insert().values(varchar=varchar, created=now)
+        query = tests.insert().values(varchar=varchar, created=datetime.utcnow())
+        return await db.execute(query)
+
+    @staticmethod
+    async def update_varchar(test_id: int, varchar: str):
+        query = tests.update().where(tests.c.id == test_id).values(varchar=varchar)
         return await db.execute(query)

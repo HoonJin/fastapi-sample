@@ -34,9 +34,17 @@ async def get_by_pagination(page: int = Query(1, gt=0), per_page: int = Query(20
 
 @test_router.post('/tests')
 async def create(test: TestCreate = Body(...)):
-    return await TestDao.insert(test.varchar)
+    test_id = await TestDao.insert(test.varchar)
+    return JSONResponse({'id': test_id})
 
 
 @test_router.delete('/tests/{t_id:int}', response_model=None)
 async def delete(t_id: int = Path(...)):
-    return await test_service.delete(t_id)
+    await test_service.delete(t_id)
+    return JSONResponse({})
+
+
+@test_router.put('/tests/{t_id:int}')
+async def update_varchar(t_id: int = Path(...), update: TestCreate = Body(...)):
+    await TestDao.update_varchar(t_id, update.varchar)
+    return JSONResponse({})
