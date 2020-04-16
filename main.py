@@ -6,7 +6,7 @@ import uvicorn
 from fastapi import FastAPI, HTTPException, Request, Response
 
 from app.test import test_router
-from app.user import user_router
+from app.user import user_router, client_router
 from config import conf, ex_handlers
 from database import db
 
@@ -38,6 +38,7 @@ async def __request_logging(req: Request, call_next: Callable) -> Response:
 
 app.include_router(test_router, tags=['tests'])
 app.include_router(user_router, tags=['users'])
+app.include_router(client_router, tags=['clients'])
 
 
 @app.on_event("startup")

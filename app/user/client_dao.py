@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 
 from sqlalchemy import Table
 
@@ -15,6 +15,12 @@ class ClientDao:
         query = clients.select().where(clients.c.user_id == user_id)
         result = await db.fetch_all(query)
         return list(map(lambda x: Client(**x), result))
+
+    @staticmethod
+    async def find_by_client_id(client_id: str) -> Optional[Client]:
+        query = clients.select().where(clients.c.client_id == client_id)
+        result = await db.fetch_one(query)
+        return Client(**result) if result is not None else None
 
     @staticmethod
     async def insert(user_id: int, name: str, client_id: str, client_secret: str, scope: str):
