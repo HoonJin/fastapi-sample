@@ -22,8 +22,8 @@ class UserDao:
         return User(**result) if result is not None else None
 
     @staticmethod
-    async def insert(email: str, encrypted_password: str, confirm_token: str):
+    async def insert(email: str, encrypted_password: str, confirmation_token: str):
         now = datetime.utcnow()
-        query = users.insert().values(email=email, password=encrypted_password, confirm_token=confirm_token,
+        query = users.insert().values(email=email, password=encrypted_password, confirmation_token=confirmation_token,
                                       created_at=now, updated_at=now)
         return await db.execute(query)

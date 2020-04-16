@@ -29,3 +29,18 @@ class User(BaseModel):
 class UserCreate(BaseModel):
     email: str
     password: str
+
+
+class Client(BaseModel):
+    id: int
+    user_id: int
+    name: str
+    client_id: str
+    client_secret: str
+    scope: str
+    trusted: bool
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        orm_mode = True
