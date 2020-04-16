@@ -1,16 +1,24 @@
 from datetime import datetime
+from enum import Enum
 from typing import Optional
 
 from pydantic import BaseModel
+
+
+class UserStatus(str, Enum):
+    unconfirmed = 'unconfirmed'
+    registered = 'registered'
+    dormant = 'dormant'
+    terminated = 'terminated'
 
 
 class User(BaseModel):
     id: int
     email: str
     password: str
-    confirm_token: Optional[str]
+    confirmation_token: Optional[str]
     confirmed_at: Optional[datetime]
-    status: str
+    status: UserStatus
     created_at: datetime
     updated_at: datetime
 

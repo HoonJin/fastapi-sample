@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import Table
+from sqlalchemy import Table, and_
 
 from database import db, get_schema
 from .domains import User
@@ -16,8 +16,8 @@ class UserDao:
         return User(**await db.fetch_one(query))
 
     @staticmethod
-    async def find_by_email(email: str) -> Optional[User]:
-        query = users.select().where(users.c.email == email)
+    async def find_by_email_and_confirmed_at_is_not_null(email: str) -> Optional[User]:
+        query = users.select().where(and_(users.c.email == email, users.c.confirmed_at != None))
         result = await db.fetch_one(query)
         return User(**result) if result is not None else None
 

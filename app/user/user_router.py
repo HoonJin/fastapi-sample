@@ -1,5 +1,5 @@
 
-from fastapi import APIRouter, status, Body, Query, Path
+from fastapi import APIRouter, Body
 from fastapi.responses import JSONResponse
 
 from .domains import UserCreate
@@ -13,3 +13,9 @@ user_service = UserService()
 async def sign_up(create: UserCreate):
     user_id = await user_service.sign_up(create)
     return JSONResponse({'id': user_id})
+
+
+@user_router.post('/users/verify')
+async def verify(email: str = Body(...), password: str = Body(...)):
+    result = await user_service.authenticate(email, password)
+    return JSONResponse({'result': result})

@@ -17,9 +17,9 @@ class UserService:
         return await UserDao.insert(create.email, encrypted_password, confirm_token)
 
     @staticmethod
-    async def verify_user(email: str, password: str):
-        user = await UserDao.find_by_email(email)
+    async def authenticate(email: str, password: str) -> bool:
+        user = await UserDao.find_by_email_and_confirmed_at_is_not_null(email)
         if user is not None:
-            pbkdf2_sha256.verify(password, user.password)
+            return pbkdf2_sha256.verify(password, user.password)
         else:
             raise HTTPException(status.HTTP_404_NOT_FOUND)
