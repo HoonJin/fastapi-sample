@@ -7,7 +7,7 @@ from fastapi import FastAPI, HTTPException, Request, Response
 
 from app.test import test_router
 from app.user import user_router, client_router
-from config import conf, ex_handlers
+from config import conf, exceptions
 from database import db
 
 ENV = conf.get('ENV', str, 'dev')
@@ -16,7 +16,7 @@ app = FastAPI(
     docs_url='/docs' if ENV == 'dev' else None,
     openapi_url='/openapi.json' if ENV == 'dev' else None,
 )
-app.add_exception_handler(HTTPException, ex_handlers.custom_http_exception_handler)
+app.add_exception_handler(HTTPException, exceptions.custom_http_exception_handler)
 
 
 # # post, put 등에서 body 를 찍기 위해 await req.body() 를 하면 무한대기에 빠져버림

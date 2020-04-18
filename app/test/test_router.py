@@ -1,8 +1,9 @@
 from typing import List
 
-from fastapi import APIRouter, status, Body, Query, Path
+from fastapi import APIRouter, Body, Query, Path
 from fastapi.responses import JSONResponse
 
+from config.exceptions import NotFoundException
 from .domains import Test, TestCreate
 from .test_dao import TestDao
 from .test_service import TestService
@@ -19,12 +20,10 @@ async def get_all():
 
 @test_router.get('/tests/{t_id:int}', response_model=Test)
 async def get(t_id: int = Path(...)):
-    result = await TestDao.find_by_id(t_id)
-    return result if result is not None else JSONResponse(status_code=status.HTTP_404_NOT_FOUND)
-    # try:
-    #     return await TestDao.get_by_id(t_id)
-    # except Exception:
-    #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    try:
+        return await TestDao.get_by_id(t_id)
+    except Exception:
+        raise NotFoundException
 
 
 @test_router.get('/tests/pagination', description='adsfasdf')

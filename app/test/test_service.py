@@ -1,6 +1,4 @@
-from fastapi import HTTPException
-from starlette import status
-
+from config.exceptions import NotFoundException
 from database import db
 from .test_dao import TestDao
 
@@ -25,4 +23,4 @@ class TestService:
             async with db.transaction():
                 await TestDao.delete_by_id(t_id)
         else:
-            raise HTTPException(status.HTTP_404_NOT_FOUND)
+            raise NotFoundException

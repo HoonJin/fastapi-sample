@@ -2,10 +2,10 @@ import secrets
 import string
 
 import jwt
-from fastapi import HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from jwt import InvalidSignatureError
+from jwt import InvalidTokenError
 
+from config.exceptions import BadRequestException, UnauthorizedException
 from .client_dao import ClientDao
 from .domains import User, TokenResponse
 from .user_dao import UserDao
@@ -25,9 +25,9 @@ class ClientService:
         client = await ClientDao.find_by_client_id(client_id)
 
         if client is None:
-            raise HTTPException(status.HTTP_400_BAD_REQUEST)
+            raise BadRequestException
         if client.client_secret != client_secret:  # TODO encrypt 또는 hash 사용해야함
-            raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+            raise UnauthorizedException
         return client
 
     @staticmethod
@@ -46,12 +46,12 @@ class ClientService:
             access_token = jwt.encode(data, client.client_secret).decode()
             return TokenResponse(access_token=access_token)
         else:
-            raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+            raise UnauthorizedException
 
     @staticmethod
     async def get_user_by_access_token(access_token: str):
         if access_token is None:
-            raise HTTPException(status.HTTP_400_BAD_REQUEST)
+            raise BadRequestException
         unverified_data = jwt.decode(access_token, verify=False, algorithms=[_ALGORITHM])
         client = await ClientDao.find_by_client_id(unverified_data.get('client_id'))
         secret = client.client_secret
@@ -60,7 +60,7 @@ class ClientService:
             user_uuid = data.get('uuid')
             user = await UserDao.find_by_uuid(user_uuid)
             if user is None:
-                raise HTTPException(status.HTTP_400_BAD_REQUEST)
+                raise BadRequestException
             return user
-        except InvalidSignatureError:
-            raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+        except InvalidTokenError as e:
+            raise UnauthorizedException(str(e))

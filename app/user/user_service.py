@@ -1,9 +1,8 @@
 import secrets
 
-from fastapi import HTTPException
 from passlib.hash import pbkdf2_sha256
-from starlette import status
 
+from config.exceptions import UnauthorizedException, NotFoundException
 from .domains import UserCreate, User
 from .user_dao import UserDao
 
@@ -22,6 +21,6 @@ class UserService:
             if pbkdf2_sha256.verify(password, user.encrypted_password):
                 return user
             else:
-                raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+                raise UnauthorizedException
         else:
-            raise HTTPException(status.HTTP_404_NOT_FOUND)
+            raise NotFoundException
