@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Callable
 
 import uvicorn
-from fastapi import FastAPI, HTTPException, Request, Response
+from fastapi import FastAPI, Request, Response
 
 from app.test import test_router
 from app.user import user_router, client_router
@@ -16,7 +16,9 @@ app = FastAPI(
     docs_url='/docs' if ENV == 'dev' else None,
     openapi_url='/openapi.json' if ENV == 'dev' else None,
 )
-app.add_exception_handler(HTTPException, exceptions.custom_http_exception_handler)
+# TODO 맵핑하는 Exception을 최상위 클래스인 Exception으로 바꿔도 HTTPException 만 처리됨
+# middleware 의 처리방식 떄문에 그런 것으로 추정
+app.add_exception_handler(exceptions.HTTPException, exceptions.custom_http_exception_handler)
 
 
 # # post, put 등에서 body 를 찍기 위해 await req.body() 를 하면 무한대기에 빠져버림

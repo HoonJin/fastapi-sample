@@ -41,7 +41,7 @@ class ClientService:
     async def create_access_token(form: OAuth2PasswordRequestForm) -> TokenResponse:
         user = await user_service.authenticate_user(form.username, form.password)
         client = await ClientDao.find_by_client_id(form.client_id)
-        if client.client_secret == form.client_secret:
+        if client is not None and client.client_secret == form.client_secret:
             data = {'uuid': user.uuid, 'client_id': client.client_id}
             access_token = jwt.encode(data, client.client_secret).decode()
             return TokenResponse(access_token=access_token)
