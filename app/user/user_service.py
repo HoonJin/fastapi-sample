@@ -19,7 +19,7 @@ class UserService:
     async def authenticate_user(email: str, password: str) -> User:
         user = await UserDao.find_by_email_and_confirmed_at_is_not_null(email)
         if user is not None:
-            if pbkdf2_sha256.verify(password, user.password):
+            if pbkdf2_sha256.verify(password, user.encrypted_password):
                 return user
             else:
                 raise HTTPException(status.HTTP_401_UNAUTHORIZED)

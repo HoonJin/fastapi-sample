@@ -19,22 +19,22 @@ app = FastAPI(
 app.add_exception_handler(HTTPException, ex_handlers.custom_http_exception_handler)
 
 
-# post, put 등에서 body 를 찍기 위해 await req.body() 를 하면 무한대기에 빠져버림
-# 마찬가지로 response 의 바디를 찍기위해 await res.body() 를 해도 무한대기함
-@app.middleware("http")
-async def __request_logging(req: Request, call_next: Callable) -> Response:
-    request_id = req.headers.get('X-Request-ID', '')
-    if req.method == "POST":
-        request_info = ""
-    elif req.method == "PUT" or req.method == "DELETE":
-        request_info = f"path_params: {req.path_params}"
-    else:  # GET
-        request_info = f"query_params: {req.query_params}"
-    logging.info(f"[{request_id}][{datetime.utcnow()}]<{req.method} {req.get('path')}> {request_info}")
-
-    res = await call_next(req)
-    logging.info(f"[{request_id}][{datetime.utcnow()}] code: {res.status_code}, headers: {res.headers}")
-    return res
+# # post, put 등에서 body 를 찍기 위해 await req.body() 를 하면 무한대기에 빠져버림
+# # 마찬가지로 response 의 바디를 찍기위해 await res.body() 를 해도 무한대기함
+# @app.middleware("http")
+# async def __request_logging(req: Request, call_next: Callable) -> Response:
+#     request_id = req.headers.get('X-Request-ID', '')
+#     if req.method == "POST":
+#         request_info = ""
+#     elif req.method == "PUT" or req.method == "DELETE":
+#         request_info = f"path_params: {req.path_params}"
+#     else:  # GET
+#         request_info = f"query_params: {req.query_params}"
+#     logging.info(f"[{request_id}][{datetime.utcnow()}]<{req.method} {req.get('path')}> {request_info}")
+#
+#     res = await call_next(req)
+#     logging.info(f"[{request_id}][{datetime.utcnow()}] code: {res.status_code}, headers: {res.headers}")
+#     return res
 
 app.include_router(test_router, tags=['tests'])
 app.include_router(user_router, tags=['users'])

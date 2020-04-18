@@ -14,8 +14,9 @@ class UserStatus(str, Enum):
 
 class User(BaseModel):
     id: int
+    uuid: str
     email: str
-    password: str
+    encrypted_password: str
     confirmation_token: Optional[str]
     confirmed_at: Optional[datetime]
     status: UserStatus
@@ -44,3 +45,8 @@ class Client(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = 'Bearer'

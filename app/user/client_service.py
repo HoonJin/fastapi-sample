@@ -1,9 +1,18 @@
 import secrets
 import string
 
+import jwt
 from fastapi import HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
+from jwt import InvalidSignatureError
 
 from .client_dao import ClientDao
+from .domains import User, TokenResponse
+from .user_dao import UserDao
+from .user_service import UserService
+
+user_service = UserService()
+_ALGORITHM = 'HS256'
 
 
 def generate_random_token(length: int = 32):
@@ -22,8 +31,36 @@ class ClientService:
         return client
 
     @staticmethod
-    async def create_client(user_id: int, name: str = 'default') -> (str, str):
+    async def create_client(user: User, name: str = 'default') -> (str, str):
         client_id = generate_random_token()
         client_secret = generate_random_token(64)
-        await ClientDao.insert(user_id, name, client_id, client_secret, '')
+        await ClientDao.insert(user.id, name, client_id, client_secret, '')
         return client_id, client_secret
+
+    @staticmethod
+    async def create_access_token(form: OAuth2PasswordRequestForm) -> TokenResponse:
+        user = await user_service.authenticate_user(form.username, form.password)
+        client = await ClientDao.find_by_client_id(form.client_id)
+        if client.client_secret == form.client_secret:
+            data = {'uuid': user.uuid, 'client_id': client.client_id}
+            access_token = jwt.encode(data, client.client_secret).decode()
+            return TokenResponse(access_token=access_token)
+        else:
+            raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+    @staticmethod
+    async def get_user_by_access_token(access_token: str):
+        if access_token is None:
+            raise HTTPException(status.HTTP_400_BAD_REQUEST)
+        unverified_data = jwt.decode(access_token, verify=False, algorithms=[_ALGORITHM])
+        client = await ClientDao.find_by_client_id(unverified_data.get('client_id'))
+        secret = client.client_secret
+        try:
+            data = jwt.decode(access_token, secret, algorithms=[_ALGORITHM])
+            user_uuid = data.get('uuid')
+            user = await UserDao.find_by_uuid(user_uuid)
+            if user is None:
+                raise HTTPException(status.HTTP_400_BAD_REQUEST)
+            return user
+        except InvalidSignatureError:
+            raise HTTPException(status.HTTP_401_UNAUTHORIZED)
