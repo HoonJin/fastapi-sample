@@ -4,12 +4,12 @@ from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordBearer
 
 from .client_router import get_current_user
-from .domains import UserCreate, User
+from .domains import UserCreate
+from .entities import User
 from .user_service import UserService
 
 user_router = APIRouter()
 user_service = UserService()
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/access_token")
 
 
 @user_router.post('/users')

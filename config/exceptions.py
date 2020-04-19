@@ -1,9 +1,14 @@
+from enum import Enum
 from http import HTTPStatus
 import logging
 from typing import Any
 
 from fastapi import Request, status
 from fastapi.responses import JSONResponse
+
+
+class ErrorCode(str, Enum):
+    token_expired = 'token_expired'
 
 
 class HTTPException(Exception):

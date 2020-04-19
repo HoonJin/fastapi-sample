@@ -5,7 +5,7 @@ from typing import Optional
 from sqlalchemy import Table, and_
 
 from database import db, get_schema
-from .domains import User
+from .entities import User
 
 users: Table = get_schema('users')
 

@@ -7,3 +7,5 @@ from starlette.config import Config
 # 패키지의 순환 구조를 막기 위해서 config package 를 따로 만들고 여기에서 import 해 사용하도록 함.
 
 conf = Config('resources/.env')
+
+SECRET_KEY = conf.get('SECRET_KEY', str)

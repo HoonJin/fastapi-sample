@@ -3,7 +3,8 @@ import secrets
 from passlib.hash import pbkdf2_sha256
 
 from config.exceptions import UnauthorizedException, NotFoundException
-from .domains import UserCreate, User
+from .domains import UserCreate
+from .entities import User
 from .user_dao import UserDao
 
 
