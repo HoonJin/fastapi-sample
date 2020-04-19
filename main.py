@@ -6,7 +6,7 @@ import uvicorn
 from fastapi import FastAPI, Request, Response
 
 from app.test import test_router
-from app.user import user_router, client_router
+from app.user import *
 from config import conf, exceptions
 from database import db
 
@@ -39,6 +39,7 @@ app.add_exception_handler(exceptions.HTTPException, exceptions.custom_http_excep
 #     return res
 
 app.include_router(test_router, tags=['tests'])
+app.include_router(login_router, tags=['login'])
 app.include_router(user_router, tags=['users'])
 app.include_router(client_router, tags=['clients'])
 
@@ -51,17 +52,6 @@ async def startup():
 @app.on_event("shutdown")
 async def shutdown():
     await db.disconnect()
-
-
-@app.get("/")
-async def root():
-    result = {"hello": "world"}
-    return result
-
-
-@app.get('/test', status_code=403)
-async def forbidden():
-    return {}
 
 
 if __name__ == '__main__':

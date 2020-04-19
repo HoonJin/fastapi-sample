@@ -1,7 +1,6 @@
 
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
-from fastapi.security import OAuth2PasswordBearer
 
 from .client_router import get_current_user
 from .domains import UserCreate
