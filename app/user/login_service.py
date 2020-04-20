@@ -38,8 +38,6 @@ class LoginService:
     @staticmethod
     async def login(form: LoginForm) -> TokenResponse:
         user = await UserService.authenticate_user(form.username, form.password)
-        if user is None:
-            raise UnauthorizedException
 
         expires_at = (datetime.utcnow() + timedelta(days=1)).timestamp()
         payload = {'uuid': user.uuid, 'iss': form.service, 'exp': expires_at}

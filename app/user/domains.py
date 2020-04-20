@@ -13,11 +13,6 @@ class UserStatus(str, Enum):
     terminated = 'terminated'
 
 
-class UserCreate(BaseModel):
-    email: str
-    password: str
-
-
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = 'Bearer'
