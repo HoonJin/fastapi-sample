@@ -11,8 +11,9 @@ from config import conf, exceptions
 from database import db
 
 ENV = conf.get('ENV', str, 'dev')
+DEBUG = True if ENV == 'dev' else conf.get('DEBUG', bool, False)
 app = FastAPI(
-    debug=True if ENV == 'dev' else conf.get('DEBUG', bool, False),
+    debug=DEBUG,
     docs_url='/docs' if ENV == 'dev' else None,
     openapi_url='/openapi.json' if ENV == 'dev' else None,
 )
@@ -56,4 +57,4 @@ async def shutdown():
 
 if __name__ == '__main__':
     LOG_LEVEL = conf.get('LOG_LEVEL', str, 'info')
-    uvicorn.run(app, host='127.0.0.1', port=8000, log_level=LOG_LEVEL, debug=True)
+    uvicorn.run(app, host='0.0.0.0', port=8000, log_level=LOG_LEVEL, debug=DEBUG)
