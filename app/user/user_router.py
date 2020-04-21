@@ -1,5 +1,5 @@
 
-from fastapi import APIRouter, Depends, Body
+from fastapi import APIRouter, Depends, Body, Query
 from fastapi.responses import JSONResponse
 
 from .client_router import get_current_user
@@ -21,7 +21,7 @@ async def get_me(user: User = Depends(get_current_user)):
     return user
 
 
-@user_router.post('/confirm')
-async def confirm(token: str = Body(...), _=Body(None)):
+@user_router.get('/confirm')
+async def confirm(token: str = Query(...)):
     await UserService.confirm(token)
     return JSONResponse({})

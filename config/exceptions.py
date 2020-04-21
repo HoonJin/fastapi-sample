@@ -1,7 +1,6 @@
-from enum import Enum
-from http import HTTPStatus
 import logging
-from typing import Any
+from enum import Enum
+from typing import Any, Optional
 
 from fastapi import Request, status
 from fastapi.responses import JSONResponse
@@ -34,18 +33,14 @@ class ErrorCode(str, Enum):
 
 
 class HTTPException(Exception):
-    def __init__(self, status_code: int, code: str, detail: str = None) -> None:
+    def __init__(self, status_code: int, code: ErrorCode, detail: Optional[Any] = None):
         self.status_code = status_code
         self.code = code
-        if detail is None:
-            http_status = HTTPStatus(status_code)
-            self.detail = f'{http_status.phrase}: {http_status.description}'
-        else:
-            self.detail = detail
+        self.detail = detail
 
     def __str__(self) -> str:
         class_name = self.__class__.__name__
-        return f"{class_name}(status_code={self.status_code!r}, code={self.code!r}, detail={self.detail!r})"
+        return f"{class_name}(status_code={self.status_code})(code={self.code}, detail={self.detail})"
 
 
 class BadRequestException(HTTPException):
@@ -74,7 +69,7 @@ class UnprocessableException(HTTPException):
 
 
 class TooManyRequestException(HTTPException):
-    def __init__(self, detail: Any = None):
+    def __init__(self, detail: Any = 'request limit is exceed'):
         super().__init__(status_code=status.HTTP_429_TOO_MANY_REQUESTS, code=ErrorCode.too_many_requests, detail=detail)
 
 
@@ -87,7 +82,10 @@ class InternalErrorException(HTTPException):
 # 추후에 모든 익셉션을 처리할 수 있도록 Exception 타입을 받는 방식으로 만듬
 async def custom_http_exception_handler(request: Request, exc: Exception) -> JSONResponse:
     request_id = request.headers.get('X-Request-ID', '')
-    if isinstance(exc, HTTPException):
+    if isinstance(exc, InternalErrorException):
+        logging.error(f"[{request_id}] {request.method} {request.url.path} request is failed. ", exc_info=True)
+        return JSONResponse({"code": exc.code, "detail": exc.detail}, status_code=exc.status_code)
+    elif isinstance(exc, HTTPException):
         logging.warning(f"[{request_id}] {request.method} {request.url.path} request is failed. {exc}")
         return JSONResponse({"code": exc.code, "detail": exc.detail}, status_code=exc.status_code)
     else:
