@@ -1,12 +1,27 @@
 version: '3'
 
 services:
-  viole:
+  db:
+    image: mysql:5.7
+    restart: always
+    expose:
+      - 3306
+    ports:
+      - 3307:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: viole
+  backend:
     build:
       context: .
       dockerfile: ./compose/Dockerfile-dev
     environment:
       - ENV=dev
+#     ${db} 로 값을 읽어올 수 없어 하드코딩 상태. TODO 하드코딩된 host 의 값을 가져올 수 있도록 변경해야함
+#      - DB_URL=mysql://root:password@${db}:3307/viole
+      - DB_URL=mysql://root:password@172.18.0.1:3307/viole
+    expose:
+      - 8000
     ports:
       - "8000:8000"
     command:

@@ -15,7 +15,7 @@ DEBUG = True if ENV == 'dev' else conf.get('DEBUG', bool, False)
 app = FastAPI(
     debug=DEBUG,
     docs_url='/docs' if ENV == 'dev' else None,
-    openapi_url='/openapi.json' if ENV == 'dev' else None,
+    redoc_url='/redoc' if ENV == 'dev' else '/docs',
 )
 # TODO 맵핑하는 Exception을 최상위 클래스인 Exception으로 바꿔도 HTTPException 만 처리됨
 # middleware 의 처리방식 떄문에 그런 것으로 추정
