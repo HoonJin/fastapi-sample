@@ -17,9 +17,7 @@ services:
       dockerfile: ./compose/Dockerfile-dev
     environment:
       - ENV=dev
-#     ${db} 로 값을 읽어올 수 없어 하드코딩 상태. TODO 하드코딩된 host 의 값을 가져올 수 있도록 변경해야함
-#      - DB_URL=mysql://root:password@${db}:3307/viole
-      - DB_URL=mysql://root:password@172.18.0.1:3307/viole
+      - DB_URL=mysql://root:password@${viole-db}:3306/viole
     expose:
       - 8000
     ports:
@@ -31,3 +29,5 @@ services:
         uvicorn main:app --host 0.0.0.0 --reload
     volumes:
       - ./:/app/
+    links:
+      - db:viole-db
