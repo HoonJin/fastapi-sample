@@ -5,33 +5,39 @@ from typing import Optional
 from pydantic import BaseModel
 
 
-class Voucher(BaseModel):
+class AbstractBaseModel(BaseModel):
     id: int
+    created_at: datetime
+    updated_at: datetime
+
+
+class Voucher(AbstractBaseModel):
     name: str
     par_value: Decimal
     category: str
-    created_at: datetime
-    updated_at: datetime
     deleted_at: Optional[datetime]
 
+    class Config:
+        orm_mode = True
 
-class VoucherSeller(BaseModel):
-    id: int
+
+class VoucherSeller(AbstractBaseModel):
     name: str
     url: str
     tel: Optional[str]
     address: Optional[str]
-    created_at: datetime
-    updated_at: datetime
     deleted_at: Optional[datetime]
 
+    class Config:
+        orm_mode = True
 
-class VoucherPrice(BaseModel):
-    id: int
+
+class VoucherPrice(AbstractBaseModel):
     voucher_id: int
     seller_id: int
     side: str
     price: Decimal
-    created_at: datetime
-    updated_at: datetime
     deleted_at: Optional[datetime]
+
+    class Config:
+        orm_mode = True
