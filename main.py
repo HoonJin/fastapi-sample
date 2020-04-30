@@ -7,6 +7,7 @@ from fastapi import FastAPI, Request, Response
 
 from app.test import test_router
 from app.user import *
+from app.voucher import voucher_router
 from config import conf, exceptions
 from database import db
 
@@ -43,6 +44,8 @@ app.include_router(test_router, tags=['tests'])
 app.include_router(login_router, tags=['login'])
 app.include_router(user_router, tags=['users'])
 app.include_router(client_router, tags=['clients'])
+
+app.include_router(voucher_router, tags=['voucher'])
 
 
 @app.on_event("startup")
