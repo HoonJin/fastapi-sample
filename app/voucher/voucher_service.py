@@ -1,12 +1,6 @@
-import itertools
-from decimal import Decimal
-
-import aiohttp
-from bs4 import BeautifulSoup
-
 from config.exceptions import NotFoundException
 from database import db
-from .domains import VOUCHER_NAME_DICT
+from . import voucher_parser
 from .voucher_dao import VoucherDao
 from .voucher_price_dao import VoucherPriceDao
 from .voucher_seller_dao import VoucherSellerDao
@@ -21,27 +15,10 @@ class VoucherService:
             raise NotFoundException
 
         vouchers = await VoucherDao.get_all()
-
-        async with aiohttp.ClientSession() as session:
-            async with session.get(seller.url) as res:
-                text = await res.text(encoding='euc-kr')
-        bs = BeautifulSoup(text, "html.parser")
-        tables = bs.find_all('table')
-        trs = tables[4].find_all('tr')
-
-        tr_data = [[td.text.split() for td in tr.find_all('td')] for tr in trs]
-        prepared = list(map(lambda x: [{
-            'name': VOUCHER_NAME_DICT.get(' '.join(x[1]), ' '.join(x[1])),
-            'side': 'bid',
-            'price': Decimal(x[2][0].replace(',', '')),
-        }, {
-            'name': VOUCHER_NAME_DICT.get(' '.join(x[1]), ' '.join(x[1])),
-            'side': 'ask',
-            'price': Decimal(x[3][0].replace(',', ''))
-        }], tr_data[1:]))
+        crawl_result = await voucher_parser.parse_data(seller)
 
         async with db.transaction():
-            for data in itertools.chain.from_iterable(prepared):
+            for data in crawl_result:
                 voucher = next(filter(lambda x: x.name == data['name'], vouchers))
                 await VoucherPriceDao.insert(voucher.id, seller_id, data['side'], data['price'])
         return
