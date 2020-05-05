@@ -1,3 +1,15 @@
+from decimal import Decimal
+from typing import Optional
+
+from pydantic import BaseModel
+
+
+class VoucherPriceDto(BaseModel):
+    name: Optional[str]
+    bid: Decimal
+    ask: Decimal
+
+
 VOUCHER_NAME_DICT = {
     "롯데백화점 50만원권": '롯데백화점 50만원권',
     "롯데백화점상품권 50만원권": '롯데백화점 50만원권',
@@ -134,7 +146,7 @@ VOUCHER_NAME_DICT = {
     "국민 기프트 카드": '국민 기프트카드 50만원권',
     "국민기프트카드 50만원": '국민 기프트카드 50만원권',
     "국민기프트50만원권": '국민 기프트카드 50만원권',
-    "국민 기프트카드(50만원권)": '국민 기프트카드 50만원권',
+    "국민기프트카드 (50만원권)": '국민 기프트카드 50만원권',
     "KEB하나 기프트카드": 'KEB하나 기프트카드 50만원권',
     "KEB하나기프트카드 50만원": 'KEB하나 기프트카드 50만원권',
     "BC 기프트 카드": 'BC 기프트카드 50만원권',

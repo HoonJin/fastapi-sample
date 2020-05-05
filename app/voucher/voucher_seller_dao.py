@@ -3,7 +3,7 @@ from typing import List, Optional
 from sqlalchemy import Table
 
 from database import db, get_schema
-from .entites import VoucherSeller
+from .entities import VoucherSeller
 
 voucher_sellers: Table = get_schema('voucher_sellers')
 

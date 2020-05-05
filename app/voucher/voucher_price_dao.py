@@ -5,7 +5,7 @@ from typing import List
 from sqlalchemy import Table
 
 from database import db, get_schema
-from .entites import VoucherPrice
+from .entities import VoucherPrice
 
 voucher_prices: Table = get_schema('voucher_prices')
 
