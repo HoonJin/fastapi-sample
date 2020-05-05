@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 
 class VoucherPriceDto(BaseModel):
-    name: Optional[str]
+    name: Optional[str]  # optional 이 아니어야 하나 구현 편의상 optional 로 처리함. 최종 메서드에서 필터링 해서 처리
     bid: Decimal
     ask: Decimal
 

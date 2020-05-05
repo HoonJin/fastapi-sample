@@ -1,10 +1,12 @@
+import asyncio
+import itertools
 import logging
 import re
 from decimal import Decimal
 from typing import Iterator, List
 
 import aiohttp
-from bs4 import BeautifulSoup, Tag
+from bs4 import BeautifulSoup, element
 
 from .domains import VOUCHER_NAME_DICT, VoucherPriceDto
 from .entities import VoucherSeller
@@ -29,9 +31,8 @@ async def __parse_wooticket_data() -> Iterator[VoucherPriceDto]:
     trs = tables[4].find_all('tr')
 
     tr_data = [[td.text.split() for td in tr.find_all('td')] for tr in trs]
-    temp = map(lambda x: VoucherPriceDto(name=__get_defined_name(' '.join(x[1])), bid=__parse_number(x[2][0]),
-                                         ask=__parse_number(x[3][0])), tr_data[1:])
-    return temp
+    return map(lambda x: VoucherPriceDto(name=__get_defined_name(' '.join(x[1])), bid=__parse_price(x[2][0]),
+                                         ask=__parse_price(x[3][0])), tr_data[1:])
 
 
 async def __parse_modooticket_data() -> Iterator[VoucherPriceDto]:
@@ -42,14 +43,13 @@ async def __parse_modooticket_data() -> Iterator[VoucherPriceDto]:
     rows = bs.find_all(href=re.compile("/goods/goods_view.php?"))
 
     filtered = [rows[x] for x in range(0, len(rows), 4)]
-    result = map(lambda x: VoucherPriceDto(
+    return map(lambda x: VoucherPriceDto(
         name=__get_defined_name(x.string),
-        bid=__parse_number(x.next_element.next_element.next_element.next_element.next_element.next_element.text),
-        ask=__parse_number(x.next_element.next_element.next_element.next_element.next_element.next_element
-                           .next_element.next_element.next_element.next_element.next_element.next_element
-                           .next_element.next_element.next_element.next_element.next_element.next_element.text)
+        bid=__parse_price(x.next_element.next_element.next_element.next_element.next_element.next_element.text),
+        ask=__parse_price(x.next_element.next_element.next_element.next_element.next_element.next_element
+                          .next_element.next_element.next_element.next_element.next_element.next_element
+                          .next_element.next_element.next_element.next_element.next_element.next_element.text)
     ), filtered)
-    return result
 
 
 async def __parse_ticketstore_data() -> Iterator[VoucherPriceDto]:
@@ -67,39 +67,36 @@ async def __parse_ticketstore_data() -> Iterator[VoucherPriceDto]:
         if "헌거" not in raw_name and __get_defined_name(raw_name.split('/')[0].strip()) is not None:
             filtered.append(row)
 
-    def get_data(bs_tag: Tag) -> VoucherPriceDto:
+    def get_data(bs_tag: element.Tag) -> VoucherPriceDto:
         tds = bs_tag.find_all('td')
-        name = __get_defined_name(tds[2].text.split('/')[0].strip())
-        return VoucherPriceDto(name=name, bid=__parse_number(tds[3].find('font').text),
-                               ask=__parse_number(tds[4].find('font').text))
+        return VoucherPriceDto(name=__get_defined_name(tds[2].text.split('/')[0].strip()),
+                               bid=__parse_price(tds[3].find('font').text), ask=__parse_price(tds[4].find('font').text))
     return map(get_data, filtered)
 
 
 async def __parse_woohyun_data() -> Iterator[VoucherPriceDto]:
+    urls = [
+        'https://wooh.co.kr/shop/list.php?ca_id=10',
+        'https://wooh.co.kr/shop/list.php?ca_id=20&sort=&sortodr=&page=2',
+        'https://wooh.co.kr/shop/list.php?ca_id=30', 'https://wooh.co.kr/shop/list.php?ca_id=50',
+        'https://wooh.co.kr/shop/list.php?ca_id=60', 'https://wooh.co.kr/shop/list.php?ca_id=70',
+        'https://wooh.co.kr/shop/list.php?ca_id=80',
+    ]
     async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as session:
-        async def get_lis(url: str):
+        async def get_data(url: str) -> Iterator[VoucherPriceDto]:
             async with session.get(url) as res:
                 text = await res.text()
                 bs = BeautifulSoup(text, 'html.parser')
-                # lis = bs.find_all('li', class_='sct_li')
-                return bs.find_all('li', class_='sct_li')
 
-        # todo 현재는 상품권만 읽어오는데 할인마트등의 카테고리에서도 읽어오고 중복데이터는 걸러내서 저장해야함.
-        # 백화점 & 할인마트 & 금강제화
-        lis1 = await get_lis('https://wooh.co.kr/shop/list.php?ca_id=10')
-        # trs2 = await get_lis('https://wooh.co.kr/shop/list.php?ca_id=20&sort=&sortodr=&page=2')
-        # # 주유
-        # trs3 = await get_lis('https://wooh.co.kr/shop/list.php?ca_id=30')
-        # # 도서문화
-        # trs4 = get_lis('https://wooh.co.kr/shop/list.php?ca_id=50')
-        # # 기프트카드
-        # trs5 = get_lis('https://wooh.co.kr/shop/list.php?ca_id=60')
+                def __get_data(tag: element.Tag) -> VoucherPriceDto:
+                    name = __get_defined_name(tag.find('div', class_='sct_txt').text.strip())
+                    prices = list(map(lambda x: x.text, tag.find_all('b')))
+                    return VoucherPriceDto(name=name, bid=__parse_price(prices[1]), ask=__parse_price(prices[0]))
+                return map(__get_data, bs.find_all('li', class_='sct_li'))
 
-    def get_data(bs_tag: Tag) -> VoucherPriceDto:
-        name = __get_defined_name(bs_tag.find('div', class_='sct_txt').text.strip())
-        prices = list(map(lambda x: x.text, bs_tag.find_all('b')))
-        return VoucherPriceDto(name=name, bid=__parse_number(prices[1]), ask=__parse_number(prices[0]))
-    return map(get_data, lis1)
+        temp = list(itertools.chain.from_iterable(await asyncio.gather(*[get_data(url) for url in urls])))
+    name_set = set([t.name for t in temp])
+    return map(lambda name: next(filter(lambda ele: ele.name == name, temp)), name_set)
 
 
 def __get_defined_name(element: str) -> str:
@@ -109,5 +106,5 @@ def __get_defined_name(element: str) -> str:
     return name
 
 
-def __parse_number(text: str) -> Decimal:
+def __parse_price(text: str) -> Decimal:
     return Decimal(''.join([t for t in text if t.isdigit()]))
