@@ -99,10 +99,10 @@ async def __parse_woohyun_data() -> Iterator[VoucherPriceDto]:
     return map(lambda name: next(filter(lambda ele: ele.name == name, temp)), name_set)
 
 
-def __get_defined_name(element: str) -> str:
-    name = VOUCHER_NAME_DICT.get(element)
+def __get_defined_name(ele: str) -> str:
+    name = VOUCHER_NAME_DICT.get(ele)
     if name is None:
-        logging.warning(f'unknown voucher name: {element}')
+        logging.warning(f'unknown voucher name: {ele}')
     return name
 
 
