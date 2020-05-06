@@ -1,7 +1,6 @@
-from typing import List
+from typing import List, Tuple, Dict
 
 from fastapi import APIRouter, Path
-from fastapi.responses import JSONResponse
 
 from .domains import VoucherPriceDto
 from .entities import Voucher
@@ -12,9 +11,15 @@ voucher_router = APIRouter()
 voucher_service = VoucherService()
 
 
-@voucher_router.post('/vouchers/crawl_by_seller/{seller_id:int}', response_model=List[VoucherPriceDto])
-async def crawl(seller_id: int = Path(...)):
-    result = await voucher_service.crawl(seller_id)
+@voucher_router.post('/vouchers/crawl')
+async def crawl():
+    result = await voucher_service.crawl_all_store()
+    return result
+
+
+@voucher_router.post('/vouchers/crawl_by_seller/{store_id:int}', response_model=Dict[str, List[VoucherPriceDto]])
+async def crawl(store_id: int = Path(...)):
+    result = await voucher_service.crawl_by_store_id(store_id)
     return result
 
 

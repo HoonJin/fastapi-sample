@@ -1,4 +1,4 @@
-INSERT INTO `voucher_sellers` (`name`, `url`, `tel`, `address`, `created_at`, `updated_at`)
+INSERT INTO `voucher_stores` (`name`, `url`, `tel`, `address`, `created_at`, `updated_at`)
 VALUES
 ('우천사', 'http://www.wooticket.com', '02-7790-8589', '(우) 04535 서울시 중구 남대문로 64-1(서울시 중구 명동 2가 88-5번지) 프린스 빌딩 1층 101호', NOW(), NOW()),
 ('모두티켓', 'http://www.modooticket.co.kr', '02-773-8989', '서울특별시 중구 명동2길 16 진주빌딩 1층', NOW(), NOW()),

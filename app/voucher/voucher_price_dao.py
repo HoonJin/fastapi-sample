@@ -17,7 +17,8 @@ class VoucherPriceDao:
         return list(map(lambda x: VoucherPrice(**x), await db.fetch_all(query)))
 
     @staticmethod
-    async def insert(voucher_id: int, seller_id: int, side: str, price: Decimal):
-        query = voucher_prices.insert().values(voucher_id=voucher_id, seller_id=seller_id, side=side, price=price,
-                                               created_at=datetime.utcnow(), updated_at=datetime.utcnow())
+    async def insert(voucher_id: int, store_id: int, side: str, price: Decimal, sequence_id: int = 0):
+        now = datetime.utcnow()
+        query = voucher_prices.insert().values(voucher_id=voucher_id, store_id=store_id, side=side, price=price,
+                                               sequence_id=sequence_id, created_at=now, updated_at=now)
         return await db.execute(query)

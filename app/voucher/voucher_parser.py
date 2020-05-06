@@ -9,20 +9,20 @@ import aiohttp
 from bs4 import BeautifulSoup, element
 
 from .domains import VOUCHER_NAME_DICT, VoucherPriceDto
-from .entities import VoucherSeller
+from .entities import VoucherStore
 
 
-async def parse_data(seller: VoucherSeller) -> List[VoucherPriceDto]:
+async def parse_data(store: VoucherStore) -> List[VoucherPriceDto]:
     method_dict = {
         '우천사': __parse_wooticket_data,
         '모두티켓': __parse_modooticket_data,
         '상품권가게': __parse_ticketstore_data,
         '우현상품권': __parse_woohyun_data,
     }
-    return list(filter(lambda x: x.name is not None, await method_dict[seller.name]()))
+    return list(filter(lambda x: x.name is not None, await method_dict[store.name](store.name)))
 
 
-async def __parse_wooticket_data() -> Iterator[VoucherPriceDto]:
+async def __parse_wooticket_data(store: str) -> Iterator[VoucherPriceDto]:
     async with aiohttp.ClientSession() as session:
         async with session.get('http://www.wooticket.com/popup_price.php') as res:
             text = await res.text()
@@ -31,11 +31,11 @@ async def __parse_wooticket_data() -> Iterator[VoucherPriceDto]:
     trs = tables[4].find_all('tr')
 
     tr_data = [[td.text.split() for td in tr.find_all('td')] for tr in trs]
-    return map(lambda x: VoucherPriceDto(name=__get_defined_name(' '.join(x[1])), bid=__parse_price(x[2][0]),
-                                         ask=__parse_price(x[3][0])), tr_data[1:])
+    return map(lambda x: VoucherPriceDto(name=__get_defined_name(' '.join(x[1])), store=store,
+                                         bid=__parse_price(x[2][0]), ask=__parse_price(x[3][0])), tr_data[1:])
 
 
-async def __parse_modooticket_data() -> Iterator[VoucherPriceDto]:
+async def __parse_modooticket_data(store: str) -> Iterator[VoucherPriceDto]:
     async with aiohttp.ClientSession() as session:
         async with session.get('http://www.modooticket.co.kr/shop/main/index.php') as res:
             text = await res.text()
@@ -44,7 +44,7 @@ async def __parse_modooticket_data() -> Iterator[VoucherPriceDto]:
 
     filtered = [rows[x] for x in range(0, len(rows), 4)]
     return map(lambda x: VoucherPriceDto(
-        name=__get_defined_name(x.string),
+        name=__get_defined_name(x.string), store=store,
         bid=__parse_price(x.next_element.next_element.next_element.next_element.next_element.next_element.text),
         ask=__parse_price(x.next_element.next_element.next_element.next_element.next_element.next_element
                           .next_element.next_element.next_element.next_element.next_element.next_element
@@ -52,7 +52,7 @@ async def __parse_modooticket_data() -> Iterator[VoucherPriceDto]:
     ), filtered)
 
 
-async def __parse_ticketstore_data() -> Iterator[VoucherPriceDto]:
+async def __parse_ticketstore_data(store: str) -> Iterator[VoucherPriceDto]:
     async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as session:
         async with session.get('https://www.ticketstore.co.kr/shop/purchase_list.php') as res:
             text = await res.text()
@@ -69,12 +69,12 @@ async def __parse_ticketstore_data() -> Iterator[VoucherPriceDto]:
 
     def get_data(bs_tag: element.Tag) -> VoucherPriceDto:
         tds = bs_tag.find_all('td')
-        return VoucherPriceDto(name=__get_defined_name(tds[2].text.split('/')[0].strip()),
+        return VoucherPriceDto(name=__get_defined_name(tds[2].text.split('/')[0].strip()), store=store,
                                bid=__parse_price(tds[3].find('font').text), ask=__parse_price(tds[4].find('font').text))
     return map(get_data, filtered)
 
 
-async def __parse_woohyun_data() -> Iterator[VoucherPriceDto]:
+async def __parse_woohyun_data(store: str) -> Iterator[VoucherPriceDto]:
     urls = [
         'https://wooh.co.kr/shop/list.php?ca_id=10',
         'https://wooh.co.kr/shop/list.php?ca_id=20&sort=&sortodr=&page=2',
@@ -91,7 +91,8 @@ async def __parse_woohyun_data() -> Iterator[VoucherPriceDto]:
                 def __get_data(tag: element.Tag) -> VoucherPriceDto:
                     name = __get_defined_name(tag.find('div', class_='sct_txt').text.strip())
                     prices = list(map(lambda x: x.text, tag.find_all('b')))
-                    return VoucherPriceDto(name=name, bid=__parse_price(prices[1]), ask=__parse_price(prices[0]))
+                    return VoucherPriceDto(name=name, store=store,
+                                           bid=__parse_price(prices[1]), ask=__parse_price(prices[0]))
                 return map(__get_data, bs.find_all('li', class_='sct_li'))
 
         temp = list(itertools.chain.from_iterable(await asyncio.gather(*[get_data(url) for url in urls])))

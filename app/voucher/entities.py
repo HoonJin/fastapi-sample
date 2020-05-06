@@ -21,7 +21,7 @@ class Voucher(AbstractBaseModel):
         orm_mode = True
 
 
-class VoucherSeller(AbstractBaseModel):
+class VoucherStore(AbstractBaseModel):
     name: str
     url: str
     tel: Optional[str]
@@ -34,7 +34,7 @@ class VoucherSeller(AbstractBaseModel):
 
 class VoucherPrice(AbstractBaseModel):
     voucher_id: int
-    seller_id: int
+    store_id: int
     side: str
     price: Decimal
     deleted_at: Optional[datetime]
