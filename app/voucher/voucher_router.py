@@ -1,4 +1,4 @@
-from typing import List, Tuple, Dict
+from typing import List
 
 from fastapi import APIRouter, Path
 
@@ -11,13 +11,13 @@ voucher_router = APIRouter()
 voucher_service = VoucherService()
 
 
-@voucher_router.post('/vouchers/crawl')
+@voucher_router.post('/vouchers/crawl', response_model=List[VoucherPriceDto])
 async def crawl():
     result = await voucher_service.crawl_all_store()
     return result
 
 
-@voucher_router.post('/vouchers/crawl_by_seller/{store_id:int}', response_model=Dict[str, List[VoucherPriceDto]])
+@voucher_router.post('/vouchers/crawl_by_seller/{store_id:int}', response_model=List[VoucherPriceDto])
 async def crawl(store_id: int = Path(...)):
     result = await voucher_service.crawl_by_store_id(store_id)
     return result

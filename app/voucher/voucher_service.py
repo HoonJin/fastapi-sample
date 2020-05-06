@@ -12,19 +12,16 @@ from .voucher_store_dao import VoucherStoreDao
 
 
 class VoucherService:
-
-    @staticmethod
-    async def crawl_all_store() -> List[VoucherPriceDto]:
+    async def crawl_all_store(self) -> List[VoucherPriceDto]:
         stores = await VoucherStoreDao.get_all()
-        result = await asyncio.gather(*[VoucherService.crawl_by_store(s) for s in stores])
+        result = await asyncio.gather(*[self.crawl_by_store(s) for s in stores])
         return list(itertools.chain.from_iterable(result))
 
-    @staticmethod
-    async def crawl_by_store_id(store_id: int) -> List[VoucherPriceDto]:
+    async def crawl_by_store_id(self, store_id: int) -> List[VoucherPriceDto]:
         store = await VoucherStoreDao.find_by_id(store_id)
         if store is None:
             raise NotFoundException
-        return await VoucherService.crawl_by_store(store)
+        return await self.crawl_by_store(store)
 
     @staticmethod
     async def crawl_by_store(store: VoucherStore) -> List[VoucherPriceDto]:
