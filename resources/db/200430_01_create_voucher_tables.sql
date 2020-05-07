@@ -1,5 +1,6 @@
 CREATE TABLE `vouchers` (
   `id` bigint(1) NOT NULL AUTO_INCREMENT,
+  `uuid` varchar(36) NOT NULL,
   `name` varchar(64) NOT NULL,
   `par_value` decimal(20, 2) NOT NULL,
   `category` varchar(32) NOT NULL,
@@ -7,11 +8,12 @@ CREATE TABLE `vouchers` (
   `updated_at` datetime(3) NOT NULL,
   `deleted_at` datetime(3) NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `uix_uuid` (`uuid`),
   UNIQUE KEY `uix_name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-create table voucher_crawl_sequences (
+create table voucher_crawling_sequences (
   `id` bigint(1) NOT NULL AUTO_INCREMENT,
   `timestamp` bigint(1) NOT NULL,
   `created_at` datetime(3) NOT NULL,

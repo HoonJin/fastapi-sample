@@ -12,10 +12,18 @@ class AbstractBaseModel(BaseModel):
 
 
 class Voucher(AbstractBaseModel):
+    uuid: str
     name: str
     par_value: Decimal
     category: str
     deleted_at: Optional[datetime]
+
+    class Config:
+        orm_mode = True
+
+
+class VoucherCrawlingSequence(AbstractBaseModel):
+    timestamp: int
 
     class Config:
         orm_mode = True
@@ -37,6 +45,7 @@ class VoucherPrice(AbstractBaseModel):
     store_id: int
     side: str
     price: Decimal
+    sequence_id: int
     deleted_at: Optional[datetime]
 
     class Config:
