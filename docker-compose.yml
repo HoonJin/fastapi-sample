@@ -14,7 +14,7 @@ services:
   backend:
     build:
       context: .
-      dockerfile: Dockerfile-compose
+      dockerfile: Dockerfile-compose-backend
     environment:
       - ENV=dev
       - DB_URL=mysql://root:password@${viole-db}:3306/viole
@@ -31,3 +31,18 @@ services:
       - ./:/app/
     links:
       - db:viole-db
+  scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile-compose-scheduler
+    environment:
+      - HOST=http://${viole-backend}:8000
+    links:
+      - backend:viole-backend
+    volumes:
+      - ./:/app/
+    command:
+      - bash
+      - -c
+      - |
+        python scheduler.py
