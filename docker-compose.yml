@@ -1,8 +1,13 @@
 version: '3'
 
+volumes:
+  viole_db_dco: {}
+
 services:
   db:
     image: mysql:5.7
+    volumes:
+      - viole_db_dco:/var/lib/mysql/data
     restart: always
     expose:
       - 3306
@@ -29,16 +34,12 @@ services:
         uvicorn main:app --host 0.0.0.0 --reload
     volumes:
       - ./:/app/
-    links:
-      - db:viole-db
   scheduler:
     build:
       context: .
       dockerfile: Dockerfile-compose-scheduler
     environment:
       - HOST=http://${viole-backend}:8000
-    links:
-      - backend:viole-backend
     volumes:
       - ./:/app/
     command:

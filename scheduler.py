@@ -25,7 +25,7 @@ async def crawl_vouchers():
 async def get_scheduler():
     scheduler = AsyncIOScheduler()
     scheduler.add_job(log, 'cron', minute='0/5')
-    scheduler.add_job(crawl_vouchers, 'cron', minute='25/30', second='1')
+    scheduler.add_job(crawl_vouchers, 'cron', hour='1/4', minute='10', second='1')
     scheduler.start()
 
 if __name__ == '__main__':
