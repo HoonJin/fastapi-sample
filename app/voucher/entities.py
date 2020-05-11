@@ -2,13 +2,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Optional
 
-from pydantic import BaseModel
-
-
-class AbstractBaseModel(BaseModel):
-    id: int
-    created_at: datetime
-    updated_at: datetime
+from app import AbstractBaseModel
 
 
 class Voucher(AbstractBaseModel):
@@ -17,13 +11,6 @@ class Voucher(AbstractBaseModel):
     par_value: Decimal
     category: str
     deleted_at: Optional[datetime]
-
-    class Config:
-        orm_mode = True
-
-
-class VoucherCrawlingSequence(AbstractBaseModel):
-    timestamp: int
 
     class Config:
         orm_mode = True

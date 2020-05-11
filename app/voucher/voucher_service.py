@@ -3,10 +3,10 @@ import itertools
 from typing import List
 
 from config.exceptions import NotFoundException
+from app.crawling.crawling_service import CrawlingService
 from . import voucher_parser
 from .domains import VoucherBidAskDto
 from .entities import VoucherStore, Voucher
-from .voucher_crawing_sequence_dao import VoucherCrawlingSequenceDao
 from .voucher_dao import VoucherDao
 from .voucher_price_dao import VoucherPriceDao
 from .voucher_store_dao import VoucherStoreDao
@@ -14,7 +14,7 @@ from .voucher_store_dao import VoucherStoreDao
 
 class VoucherService:
     async def crawl_all_store(self) -> List[VoucherBidAskDto]:
-        sequence_id = await VoucherCrawlingSequenceDao.insert()
+        sequence_id = await CrawlingService.generate_voucher_job_sequence()
         stores = await VoucherStoreDao.get_all()
         result = await asyncio.gather(*[self.crawl_by_store(s, sequence_id) for s in stores])
         return list(itertools.chain.from_iterable(result))
@@ -27,7 +27,7 @@ class VoucherService:
 
     @staticmethod
     async def last_tickers():
-        sequence = await VoucherCrawlingSequenceDao.get_last()
+        sequence = await CrawlingService.get_voucher_last_sequence()
         stores = await VoucherStoreDao.get_all()
         vouchers = await VoucherDao.get_all()
         prices = await VoucherPriceDao.get_by_sequence_id(sequence.id)

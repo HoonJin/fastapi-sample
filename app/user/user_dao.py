@@ -45,6 +45,7 @@ class UserDao:
     @staticmethod
     async def insert(email: str, encrypted_password: str, confirmation_token: str):
         now = datetime.utcnow()
-        query = users.insert().values(email=email, uuid=str(uuid.uuid4()), encrypted_password=encrypted_password,
-                                      confirmation_token=confirmation_token, created_at=now, updated_at=now)
+        query = users.insert()\
+            .values(email=email, uuid=str(uuid.uuid4()), encrypted_password=encrypted_password,
+                    confirmation_token=confirmation_token, created_at=now, updated_at=now)
         return await db.execute(query)

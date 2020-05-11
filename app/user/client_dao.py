@@ -31,7 +31,7 @@ class ClientDao:
     @staticmethod
     async def insert(user_id: int, name: str, client_id: str, encrypted_secret: str, scope: str = ''):
         now = datetime.utcnow()
-        query = clients.insert().values(user_id=user_id, name=name, client_id=client_id,
-                                        encrypted_secret=encrypted_secret, scope=scope,
-                                        expires_at=now, created_at=now, updated_at=now)
+        query = clients.insert()\
+            .values(user_id=user_id, name=name, client_id=client_id, encrypted_secret=encrypted_secret, scope=scope,
+                    expires_at=now, created_at=now, updated_at=now)
         return await db.execute(query)

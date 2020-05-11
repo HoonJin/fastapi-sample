@@ -13,15 +13,6 @@ CREATE TABLE `vouchers` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-create table voucher_crawling_sequences (
-  `id` bigint(1) NOT NULL AUTO_INCREMENT,
-  `timestamp` bigint(1) NOT NULL,
-  `created_at` datetime(3) NOT NULL,
-  `updated_at` datetime(3) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE =InnoDB DEFAULT CHARSET=utf8;
-
-
 create table `voucher_stores` (
   `id` bigint(1) NOT NULL AUTO_INCREMENT,
   `name` varchar(64) NOT NULL,

@@ -25,6 +25,7 @@ class VoucherPriceDao:
     @staticmethod
     async def insert(voucher_id: int, store_id: int, side: str, price: Decimal, sequence_id: int):
         now = datetime.utcnow()
-        query = voucher_prices.insert().values(voucher_id=voucher_id, store_id=store_id, side=side, price=price,
-                                               sequence_id=sequence_id, created_at=now, updated_at=now)
+        query = voucher_prices.insert()\
+            .values(voucher_id=voucher_id, store_id=store_id, side=side, price=price, sequence_id=sequence_id,
+                    created_at=now, updated_at=now)
         return await db.execute(query)
