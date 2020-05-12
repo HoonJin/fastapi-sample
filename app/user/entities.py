@@ -1,28 +1,23 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel
-
+from app import AbstractBaseModel
 from .domains import UserStatus
 
 
-class User(BaseModel):
-    id: int
+class User(AbstractBaseModel):
     uuid: str
     email: str
     encrypted_password: str
     confirmation_token: Optional[str]
     confirmed_at: Optional[datetime]
     status: UserStatus
-    created_at: datetime
-    updated_at: datetime
 
     class Config:
         orm_mode = True
 
 
-class Client(BaseModel):
-    id: int
+class Client(AbstractBaseModel):
     user_id: int
     name: str
     client_id: str
@@ -30,8 +25,6 @@ class Client(BaseModel):
     scope: str
     trusted: bool
     expires_at: datetime
-    created_at: datetime
-    updated_at: datetime
 
     class Config:
         orm_mode = True
